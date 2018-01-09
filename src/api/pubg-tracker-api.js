@@ -5,15 +5,14 @@ class PubgTrackerAPI {
 
   getProfileByNickname(nickname) {
     const playerName = encodeURIComponent(String(nickname).toLowerCase().replace(/\s/g, ''));
-    const uri = `https://pubgtracker.com/api/profile/pc/${playerName}`;
+    const uri = `https://api.pubgtracker.com/v2/profile/pc/${playerName}`;
 
     return this.handleCache(uri)
       .then((content) => new Profile(content));
   }
 
   getAccountBySteamID(steamId) {
-    const query = queryString.stringify({steamId}, {encode: true});
-    const uri = `https://pubgtracker.com/api/search?${query}`;
+    const uri = `https://api.pubgtracker.com/v2/matches/pc/${steamId}`;
 
     return this.handleCache(uri);
   }

@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const request = require('request-promise');
 
 const {RedisCache, NoCache} = require('./cache');
-const {EmptyApiKey, ProfileNotFound} = require('./pubg-errors');
+const {EmptyApiKey, ProfileNotFound, APITemporarilyDisabled} = require('./pubg-errors');
 const PubgTrackerAPI = require('./api/pubg-tracker-api');
 
 class Client extends PubgTrackerAPI {
@@ -57,7 +57,7 @@ class Client extends PubgTrackerAPI {
         }
 
         if (data.error) {
-          throw new ProfileNotFound(data.message);
+          throw new (data.code === 3 ? APITemporarilyDisabled : ProfileNotFound)(data.message);
         }
 
         const key = this.createKey(uri);

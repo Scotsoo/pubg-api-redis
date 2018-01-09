@@ -25,9 +25,9 @@ class ProfileNotFound extends Error {
 }
 
 /**
- * ProfileNotFound
+ * StatsNotFound
  *
- * @class ProfileNotFound
+ * @class StatsNotFound
  * @extends {Error}
  */
 class StatsNotFound extends Error {
@@ -37,8 +37,22 @@ class StatsNotFound extends Error {
   }
 }
 
+/**
+ * APITemporarilyDisabled
+ *
+ * @class APITemporarilyDisabled
+ * @extends {Error}
+ */
+class APITemporarilyDisabled extends Error {
+  constructor(msg) {
+    super(msg || 'API is temporarily disabled');
+    this.name = this.constructor.name;
+  }
+}
+
 module.exports = {
   EmptyApiKey,
   ProfileNotFound,
   StatsNotFound,
+  ApiTemporarilyDisabled,
 };

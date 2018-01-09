@@ -54,5 +54,5 @@ module.exports = {
   EmptyApiKey,
   ProfileNotFound,
   StatsNotFound,
-  ApiTemporarilyDisabled,
+  APITemporarilyDisabled,
 };

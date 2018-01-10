@@ -50,9 +50,23 @@ class APITemporarilyDisabled extends Error {
   }
 }
 
+/**
+ * APIRateLimitError
+ *
+ * @class APIRateLimitError
+ * @extends {Error}
+ */
+class APIRateLimitError extends Error {
+  constructor(msg) {
+    super(msg || 'API rate limit hit');
+    this.name = this.constructor.name;
+  }
+}
+
 module.exports = {
   EmptyApiKey,
   ProfileNotFound,
   StatsNotFound,
   APITemporarilyDisabled,
+  APIRateLimitError,
 };

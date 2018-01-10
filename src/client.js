@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const request = require('request-promise');
 
 const {RedisCache, NoCache} = require('./cache');
-const {EmptyApiKey, ProfileNotFound, APITemporarilyDisabled} = require('./pubg-errors');
+const {EmptyApiKey, ProfileNotFound, APITemporarilyDisabled, APIRateLimitError} = require('./pubg-errors');
 const PubgTrackerAPI = require('./api/pubg-tracker-api');
 
 class Client extends PubgTrackerAPI {
@@ -47,24 +47,43 @@ class Client extends PubgTrackerAPI {
 
   makeHttpRequest(uri) {
     let data;
-
-    return Promise.resolve(request(uri, {headers: this.requestHeaders}))
-      .then((body) => {
-        try {
-          data = JSON.parse(body);
-        } catch (err) {
-          throw new Error('Failed to parse JSON', err, body);
-        }
-
-        if (data.error) {
-          throw new (data.code === 3 ? APITemporarilyDisabled : ProfileNotFound)(data.message);
-        }
+    let requestData = {
+      uri,
+      headers: this.requestHeaders,
+      method: 'GET',
+      resolveWithFullResponse: true
+    }
+    return Promise.resolve(request(requestData))
+      .then(({body, headers}) => {
+        // let minuteLeft = headers['x-ratelimit-remaining-minute'];
+        console.log(minuteLeft);
+        data = this.resolveBody(body);
 
         const key = this.createKey(uri);
 
         return this.cache.set(key, body);
       })
       .then(() => data);
+  }
+
+  resolveBody(requestBody) {
+    let data;
+    try {
+      data = JSON.parse(requestBody);
+    } catch (err) {
+      throw new APIParseError(err, requestBody)
+    }
+    if(data.error){
+      let error = ProfileNotFound;
+      if (data.code === 3) {
+        throw new APITemporarilyDisabled(data.error)
+      } else {
+        throw new ProfileNotFound(data.error);
+      }
+    } else if (data.message && data.message.indexOf('API Rate limit exceeded')) {
+      throw new APIRateLimitError(data.message);
+    }
+    return data;
   }
 }
 

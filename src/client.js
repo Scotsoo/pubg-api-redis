@@ -55,8 +55,6 @@ class Client extends PubgTrackerAPI {
     }
     return Promise.resolve(request(requestData))
       .then(({body, headers}) => {
-        // let minuteLeft = headers['x-ratelimit-remaining-minute'];
-        console.log(minuteLeft);
         data = this.resolveBody(body);
 
         const key = this.createKey(uri);
